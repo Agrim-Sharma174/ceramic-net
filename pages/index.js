@@ -80,18 +80,23 @@ export default function Home() {
 
 function RecordSetter() {
   const [name, setName] = useState("");
-  const record = useViewerRecord("basicRecord");
+  const record = useViewerRecord("basicProfile");
+
+  console.log(record);
   const updateRecordName = async (name) => {
     await record.merge({
       name: name,
-    })
-  }
+    });
+  };
+
   return (
     <div className={styles.content}>
       <div className={styles.mt2}>
         {record.content ? (
           <div className={styles.flexCol}>
-            <span className={styles.subtitle}>Hello {record.content.name}!</span>
+            <span className={styles.subtitle}>
+              Hello {record.content.name}!
+            </span>
 
             <span>
               The above name was loaded from Ceramic Network. Try updating it
@@ -100,8 +105,8 @@ function RecordSetter() {
           </div>
         ) : (
           <span>
-            You do not have a profile record attached to your 3ID. Create a basic
-            profile by setting a name below.
+            You do not have a profile stream attached to your 3ID. Create a
+            basic profile by setting a name below.
           </span>
         )}
       </div>
@@ -113,7 +118,7 @@ function RecordSetter() {
         onChange={(e) => setName(e.target.value)}
         className={styles.mt2}
       />
-      <button className={styles.button} onClick={() => updateRecordName(name)}>Update</button>
+      <button onClick={() => updateRecordName(name)}>Update</button>
     </div>
   );
 }
