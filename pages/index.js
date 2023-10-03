@@ -5,6 +5,7 @@ import { EthereumAuthProvider } from "@self.id/web";
 import Web3Modal from "web3modal";
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
+import { useViewerRecord } from "@self.id/react";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,26 +20,26 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if(connection.status !== "connected") {
+    if (connection.status !== "connected") {
       web3ModalRef.current = new Web3Modal({
         network: "sepolia",
-        providerOptions:{},
+        providerOptions: {},
         disableInjectedProvider: false,
       });
     }
-  },[connection.status]);
+  }, [connection.status]);
 
   const connectToSelfID = async () => {
-  const ethereumAuthProvider = await getEthereumAuthProvider();
-  connect(ethereumAuthProvider);
-};
+    const ethereumAuthProvider = await getEthereumAuthProvider();
+    connect(ethereumAuthProvider);
+  };
 
-const getEthereumAuthProvider = async () => {
-  const wrappedProvider = await getProvider();
-  const signer = wrappedProvider.getSigner();
-  const address = await signer.getAddress();
-  return new EthereumAuthProvider(wrappedProvider.provider, address);
-};
+  const getEthereumAuthProvider = async () => {
+    const wrappedProvider = await getProvider();
+    const signer = wrappedProvider.getSigner();
+    const address = await signer.getAddress();
+    return new EthereumAuthProvider(wrappedProvider.provider, address);
+  };
 
   return (
     <div className={styles.main}>
@@ -56,7 +57,7 @@ const getEthereumAuthProvider = async () => {
           </button>
         )}
       </div>
-  
+
       <div className={styles.content}>
         <div className={styles.connection}>
           {connection.status === "connected" ? (
@@ -73,6 +74,46 @@ const getEthereumAuthProvider = async () => {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function RecordSetter() {
+  const [name, setName] = useState("");
+  const record = useViewerRecord("basicRecord");
+  const updateRecordName = async (name) => {
+    await record.merge({
+      name: name,
+    })
+  }
+  return (
+    <div className={styles.content}>
+      <div className={styles.mt2}>
+        {record.content ? (
+          <div className={styles.flexCol}>
+            <span className={styles.subtitle}>Hello {record.content.name}!</span>
+
+            <span>
+              The above name was loaded from Ceramic Network. Try updating it
+              below.
+            </span>
+          </div>
+        ) : (
+          <span>
+            You do not have a profile record attached to your 3ID. Create a basic
+            profile by setting a name below.
+          </span>
+        )}
+      </div>
+
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className={styles.mt2}
+      />
+      <button className={styles.button} onClick={() => updateRecordName(name)}>Update</button>
     </div>
   );
 }
